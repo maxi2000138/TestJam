@@ -1,36 +1,34 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class GM : MonoBehaviour
 {
-    [SerializeField] private GameObject WinPanel;
-	private IEnemy[] enemies;
+[SerializeField] private GameObject _winPanel;
+	private IEnemy[] _enemies;
 
 
 	private void OnEnable() {
-		enemies = GetComponentsInChildren<IEnemy>();
-		foreach (IEnemy item in enemies) {
-			item.OnDeath += CheckWin;
+		_enemies = GetComponentsInChildren<IEnemy>();
+		foreach (IEnemy enemy in _enemies) {
+			enemy.OnDeath += CheckWin;
 		}
 	}
 
 	private void OnDisable() {
-		foreach (IEnemy item in enemies) {
-			item.OnDeath -= CheckWin;
+		foreach (IEnemy enemy in _enemies) {
+			enemy.OnDeath -= CheckWin;
 		}
 	}
 
-	void CheckWin() {
-		foreach (IEnemy item in enemies) {
-			if (item.Health != 0)
+	public void CheckWin() {
+		foreach (IEnemy enemy in _enemies) {
+			if (enemy.Health != 0)
 				return;
 		}
 		WinGame();
 	}
 
-	void WinGame() {
-        WinPanel.SetActive(true);
+	private void WinGame() {
+        _winPanel.SetActive(true);
 	}
     
 }
