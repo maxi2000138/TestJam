@@ -1,13 +1,11 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using UnityEngine.Events;
 
 public interface IEnemy 
 {
-    public int Health { get; set; }
+    int Damage {get; set; }
+    int Health { get; set; }
 
-    public event UnityAction OnDeath;
-    public void TakeDamage();
+     event UnityAction OnDeath;
+     void TakeDamage(int _damage);
 
 }
