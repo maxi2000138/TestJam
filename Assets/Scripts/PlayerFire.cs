@@ -9,68 +9,71 @@ public class PlayerFire : MonoBehaviour
     [SerializeField] private Transform _pistol;
     [SerializeField] private Transform _firePos;
     [SerializeField] private GameObject _bulletPrefab;
-    [SerializeField] private float StartTimeBtwShoots;
-    [SerializeField] Player player;
-    private float TimeBtwShoots = 0;
+    [SerializeField] private float _startTimeBtwShoots;
+    [SerializeField] private Player _player;
+    private float _timeBtwShoots = 0;
 
-	private void Start() {
-        TimeBtwShoots = StartTimeBtwShoots;
-	}
-
-
-	void Update()
+	private void Start() 
     {
-
+        ChangeBulletCharge();
+	}
+    private void ChangeBulletCharge() =>  _timeBtwShoots = _startTimeBtwShoots;
+    private void ChangeRotation(Vector3 _vector) => _pistol.eulerAngles = _vector;
+    private void CreateBullet() => Instantiate(_bulletPrefab, _firePos.position, _firePos.rotation);
+     
+	private void Update()
+    {
         if (Input.GetKeyDown(KeyCode.D)) {
-            _pistol.eulerAngles = Vector3.zero;
+            ChangeRotation(Vector3.zero);
         }
         if (Input.GetKeyDown(KeyCode.A)) {
-            _pistol.eulerAngles = new Vector3(0f,0f, 180f);
+            ChangeRotation(new Vector3(0f,0f, 180f));
         }
         if (Input.GetKeyDown(KeyCode.W)) {
-            _pistol.eulerAngles = new Vector3(0f, 0f, 90f);
+           ChangeRotation(new Vector3(0f, 0f, 90f));
         }
         if (Input.GetKeyDown(KeyCode.S)) {
-            _pistol.eulerAngles = new Vector3(0f,0f, -90f);
+             ChangeRotation(new Vector3(0f, 0f, 90f));
         }
 
         if (Input.GetKey(KeyCode.S) && Input.GetKey(KeyCode.D)) {
-            _pistol.eulerAngles = new Vector3(0f, 0f, -45f);
+            ChangeRotation( new Vector3(0f, 0f, -45f));
         }
 
         if (Input.GetKey(KeyCode.S) && Input.GetKey(KeyCode.A)) {
-            _pistol.eulerAngles = new Vector3(0f, 0f, 225f);
+             ChangeRotation( new Vector3(0f, 0f, 225f));
         }
 
         if (Input.GetKey(KeyCode.W) && Input.GetKey(KeyCode.A)) {
-            _pistol.eulerAngles = new Vector3(0f, 0f, 135f);
+             ChangeRotation(new Vector3(0f, 0f, 135f));
         }
 
         if (Input.GetKey(KeyCode.W) && Input.GetKey(KeyCode.D)) {
-            _pistol.eulerAngles = new Vector3(0f, 0f, 45f);
+           ChangeRotation(new Vector3(0f, 0f, 45f));
         }
-
-        if (Input.GetKeyDown(KeyCode.RightShift)) {
-            Instantiate(_bulletPrefab, _firePos.position, _firePos.rotation);
+        if (Input.GetKeyDown(KeyCode.RightShift))
+        {
+            CreateBullet();
         }
         else if (Input.GetKey(KeyCode.RightShift)) {
-            if (TimeBtwShoots <= 0) {
-                Instantiate(_bulletPrefab, _firePos.position, _firePos.rotation);
-                TimeBtwShoots = StartTimeBtwShoots;
+            if (_timeBtwShoots <= 0) 
+            {
+                CreateBullet();
+                ChangeBulletCharge();
             }
-            else {
-                TimeBtwShoots -= Time.deltaTime;
+            else 
+            {
+                _timeBtwShoots -= Time.deltaTime;
             }
         }
         
 
 
-        if (Input.GetKeyDown(KeyCode.RightControl)) {
-            player.enabled = false;
-		}
+        if (Input.GetKeyDown(KeyCode.RightControl))
+            _player.enabled = false;
         else if (Input.GetKeyUp(KeyCode.RightControl)) {
-            player.enabled = true;
-        }
+            _player.enabled = true;
+       }
 
 
 
