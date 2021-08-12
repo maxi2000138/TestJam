@@ -5,53 +5,60 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody2D))]
 public class Player : MonoBehaviour
 {
-    //[SerializeField] private float _speed;
-    //[SerializeField] private float _jumpForce = 5f;
-
-    public float MinGroundNormalY = .65f;
-    public float GravityModifier = 1f;
-    public Vector2 Velocity;
-    public float JumpScale = 1;
-    public LayerMask LayerMask;
+  [SerializeField] private float MinGroundNormalY = .65f;
+    [SerializeField] private float GravityModifier = 1f;
+    [SerializeField] private Vector2 Velocity;
+    [SerializeField]private float JumpScale = 1;
+    [SerializeField] private LayerMask LayerMask;
 
     protected Vector2 targetVelocity;
-    protected bool grounded;
+    protected bool isOnGround;
     protected Vector2 groundNormal;
-    protected Rigidbody2D rb2d;
+    protected Rigidbody2D _rigidbody2d;
     protected ContactFilter2D contactFilter;
     protected RaycastHit2D[] hitBuffer = new RaycastHit2D[16];
     protected List<RaycastHit2D> hitBufferList = new List<RaycastHit2D>(16);
 
     protected const float minMoveDistance = 0.001f;
     protected const float shellRadius = 0.01f;
-    protected PlatformEffector2D platform;
-
+    protected PlatformEffector2D _platform;
+     private bool isTurned;
+ private Vector3 _sizes;
 
 
 	private void OnEnable() {
-        rb2d = GetComponent<Rigidbody2D>();
+        _rigidbody2d = GetComponent<Rigidbody2D>();
 	}
-	void Start()
+	private void Start()
     {
+        _sizes = transform.localScale;
         contactFilter.useTriggers = false;
         contactFilter.SetLayerMask(LayerMask);
         contactFilter.useLayerMask = true;
 
     }
 
-    // Update is called once per frame
-    void Update()
+   
+    private void Update()
     {
-        targetVelocity = new Vector2(Input.GetAxis("Horizontal"), 0) * 5;
-        if (Input.GetKey(KeyCode.Space) && grounded)
+        float movement = Input.GetAxis("Horizontal");
+        targetVelocity = new Vector2(movement, 0) * 5;
+        if (Input.GetKey(KeyCode.Space) && isOnGround)
+        {
             Velocity.y = 5;
+        }
+            if(movement != 0)
+       {
+           isTurned = movement > 0;
+           ChangeDirection();
+       }
     }
 
 	private void FixedUpdate() {
         Velocity += GravityModifier * Physics2D.gravity * Time.deltaTime;
         Velocity.x = targetVelocity.x;
 
-        grounded = false;
+        isOnGround = false;
 
         Vector2 deltaPosition = Velocity * Time.deltaTime;
         Vector2 moveAlongGround = new Vector2(groundNormal.y, -groundNormal.x);
@@ -64,12 +71,13 @@ public class Player : MonoBehaviour
         Movement(move, true);
 	}
 
-    void Movement(Vector2 move, bool yMovement) {
+   private void Movement(Vector2 move, bool yMovement) 
+   {
         float distance = move.magnitude;
 
         if (distance > minMoveDistance) {
 
-            int count = rb2d.Cast(move, contactFilter, hitBuffer, distance + shellRadius);
+            int count = _rigidbody2d.Cast(move, contactFilter, hitBuffer, distance + shellRadius);
 
             hitBufferList.Clear();
 
@@ -81,7 +89,7 @@ public class Player : MonoBehaviour
 			for (int i = 0; i < hitBufferList.Count; i++) {
                 Vector2 currentNormal = hitBufferList[i].normal;
                 if(currentNormal.y > MinGroundNormalY) {
-                    grounded = true;
+                    isOnGround = true;
 					if (yMovement) {
                         groundNormal = currentNormal;
                         currentNormal.x = 0;
@@ -98,6 +106,13 @@ public class Player : MonoBehaviour
 			}
 		}
 
-        rb2d.position = rb2d.position + move.normalized * distance;
+        _rigidbody2d.position = _rigidbody2d.position + move.normalized * distance;
 	}
+       private void ChangeDirection() 
+    {
+       float _turn = isTurned ?_sizes.x : -_sizes.x;
+      Vector3 scale = transform.localScale;
+        scale.x = _turn;
+       transform.localScale = scale;
+   }
 }
